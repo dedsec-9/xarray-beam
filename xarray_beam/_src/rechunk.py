@@ -33,6 +33,9 @@ def normalize_chunks(
     dim_sizes: Mapping[str, int],
 ) -> Dict[str, int]:
   """Normalize a dict of chunks."""
+  missing = [k for k in chunks if k not in dim_sizes]
+  if missing:
+    raise ValueError(f'invalid chunk keys are not dimensions: {missing}')
   result = {}
   for dim, size in dim_sizes.items():
     if dim not in chunks:
@@ -47,12 +50,6 @@ def normalize_chunks(
     elif chunks[dim] == -1:
       result[dim] = size
     else:
-      remainder = size % chunks[dim]
-      if remainder:
-        raise ValueError(
-            f'chunks for dimension {dim} do not evenly divide dimension size: '
-            f'{chunks[dim]} vs {size}'
-        )
       result[dim] = chunks[dim]
   return result
 
